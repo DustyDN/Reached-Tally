@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Global Counter</title>
+  <title>Reached</title>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
     #counter { font-size: 4em; margin: 20px; }
@@ -10,7 +10,7 @@
   </style>
 </head>
 <body>
-  <h1>🌍 Global Counter</h1>
+  <h1>Reached</h1>
   <div id="counter">Loading...</div>
   <button onclick="updateCounter(1)">+1</button>
   <button onclick="updateCounter(-1)">-1</button>
@@ -35,7 +35,7 @@
     }
 
     // Refresh counter every 2 seconds so all clients stay synced
-    setInterval(getCounter, 2000);
+    setInterval(getCounter, 10);
 
     // Load initial value
     getCounter();
