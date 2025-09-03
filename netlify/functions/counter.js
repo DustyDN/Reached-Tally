@@ -1,5 +1,3 @@
-import fetch from "node-fetch";
-
 export async function handler(event) {
   const UPSTASH_URL = process.env.UPSTASH_URL;
   const UPSTASH_TOKEN = process.env.UPSTASH_TOKEN;
