@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Global Counter</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    #counter { font-size: 4em; margin: 20px; }
+    button { font-size: 2em; margin: 10px; padding: 10px 20px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>🌍 Global Counter</h1>
+  <div id="counter">Loading...</div>
+  <button onclick="updateCounter(1)">+1</button>
+  <button onclick="updateCounter(-1)">-1</button>
+
+  <script>
+    const counterElement = document.getElementById("counter");
+
+    async function getCounter() {
+      const res = await fetch("/.netlify/functions/counter");
+      const data = await res.json();
+      counterElement.textContent = data.value;
+    }
+
+    async function updateCounter(change) {
+      const res = await fetch("/.netlify/functions/counter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ change })
+      });
+      const data = await res.json();
+      counterElement.textContent = data.value;
+    }
+
+    // Refresh counter every 2 seconds so all clients stay synced
+    setInterval(getCounter, 2000);
+
+    // Load initial value
+    getCounter();
+  </script>
+</body>
+</html>
