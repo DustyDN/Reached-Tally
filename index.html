@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Global Counter</title>
+  <title>Reached</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
   <style>
@@ -10,8 +10,8 @@
     body {
       margin: 0;
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(180deg, #f0f4f8 0%, #d9e2ec 100%);
-      color: #102a43;
+      background: #0E0E10;
+      color: #EDEDED;
       text-align: center;
       padding: 60px 20px;
     }
@@ -20,14 +20,17 @@
       font-size: 2.4rem;
       font-weight: 800;
       margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #6C63FF, #4A90E2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     /* Glass card */
     .card {
-      background: rgba(255, 255, 255, 0.70);
-      backdrop-filter: blur(10px);
+      background: #1A1A1C;
+      border: 1px solid #2A2A2D;
       border-radius: 16px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
       padding: 40px;
       max-width: 500px;
       margin: 0 auto 40px;
@@ -39,7 +42,9 @@
       font-size: 3.6rem;
       font-weight: 800;
       margin: 20px 0;
-      color: #2f80ed;
+      background: linear-gradient(135deg, #6C63FF, #4A90E2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .btn-group {
@@ -56,33 +61,35 @@
       border: none;
       border-radius: 12px;
       cursor: pointer;
-      background: linear-gradient(135deg, #2f80ed, #56ccf2);
+      background: linear-gradient(135deg, #6C63FF, #4A90E2);
       color: white;
-      box-shadow: 0 8px 20px rgba(47, 128, 237, 0.2);
+      box-shadow: 0 8px 20px rgba(108, 99, 255, 0.3);
       transition: all 0.2s ease;
     }
     button:hover {
-      box-shadow: 0 12px 28px rgba(47, 128, 237, 0.3);
+      box-shadow: 0 12px 28px rgba(108, 99, 255, 0.5);
       transform: translateY(-2px);
     }
     button:active {
       transform: translateY(1px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
-    input[type="number"] {
+    input[type="number"], #commentInput {
       padding: 10px 14px;
-      border: 1px solid #bcccdc;
+      border: 1px solid #333;
       border-radius: 10px;
       font-size: 1rem;
       width: 120px;
       text-align: center;
+      background: #121214;
+      color: #EDEDED;
     }
 
     #localClicker {
       margin-top: 14px;
       font-size: 1rem;
-      color: #219653;
+      color: #6C63FF;
     }
 
     /* Sections */
@@ -94,30 +101,57 @@
     }
 
     .section {
-      background: #fff;
+      background: #1A1A1C;
       padding: 24px;
       border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      border: 1px solid #2A2A2D;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
       text-align: left;
-      transition: box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      max-height: 300px;
     }
-    .section:hover { box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08); }
 
     .section h2 {
       font-size: 1.2rem;
       font-weight: 600;
       margin-top: 0;
       margin-bottom: 12px;
-      color: #334e68;
+      color: #A0AEC0;
+    }
+
+    #commentList, #logList {
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #4A90E2 #1A1A1C;
+    }
+    #commentList::-webkit-scrollbar, #logList::-webkit-scrollbar {
+      width: 8px;
+    }
+    #commentList::-webkit-scrollbar-thumb, #logList::-webkit-scrollbar-thumb {
+      background: #4A90E2;
+      border-radius: 4px;
     }
 
     .entry {
-      padding: 6px 0;
-      border-bottom: 1px solid #e1e8ed;
+      padding: 8px 0;
+      border-bottom: 1px solid #2A2A2D;
       font-size: 0.95rem;
-      color: #486581;
+      color: #EDEDED;
+      transition: background 0.2s;
+    }
+    .entry:hover {
+      background: rgba(255,255,255,0.05);
     }
     .entry:last-child { border-bottom: none; }
+
+    .timestamp {
+      font-size: 0.75rem;
+      color: #9CA3AF;
+      margin-top: 4px;
+      display: block;
+    }
 
     #commentBox {
       display: flex;
@@ -126,10 +160,6 @@
     }
     #commentInput {
       flex: 1;
-      padding: 10px;
-      border: 1px solid #bcccdc;
-      border-radius: 10px;
-      font-size: 1rem;
     }
   </style>
 </head>
@@ -214,6 +244,11 @@
     commentInput.value = "";
   }
 
+  function formatTime(ts) {
+    const d = new Date(ts);
+    return d.toLocaleTimeString([], {hour: "2-digit", minute:"2-digit"});
+  }
+
   function render(data) {
     counterEl.textContent = data.counter ?? 0;
 
@@ -221,7 +256,7 @@
     data.comments.slice().reverse().forEach(c => {
       const div = document.createElement("div");
       div.className = "entry";
-      div.textContent = `${c.text} · ${new Date(c.timestamp).toLocaleTimeString()}`;
+      div.innerHTML = `${c.text}<span class="timestamp">${formatTime(c.timestamp)}</span>`;
       commentList.appendChild(div);
     });
 
@@ -229,7 +264,7 @@
     data.log.slice().reverse().forEach(l => {
       const div = document.createElement("div");
       div.className = "entry";
-      div.textContent = `${l.action > 0 ? "+" : ""}${l.action} → ${l.newValue} · ${new Date(l.timestamp).toLocaleTimeString()}`;
+      div.innerHTML = `${l.action > 0 ? "+" : ""}${l.action} → ${l.newValue}<span class="timestamp">${formatTime(l.timestamp)}</span>`;
       logList.appendChild(div);
     });
   }
