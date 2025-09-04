@@ -23,6 +23,7 @@
       background: linear-gradient(135deg, #6C63FF, #4A90E2);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      animation: fadeIn 1s ease-out;
     }
 
     /* Glass card */
@@ -35,6 +36,7 @@
       max-width: 500px;
       margin: 0 auto 40px;
       transition: transform 0.3s ease;
+      animation: fadeInUp 0.8s ease-out;
     }
     .card:hover { transform: translateY(-5px); }
 
@@ -45,6 +47,10 @@
       background: linear-gradient(135deg, #6C63FF, #4A90E2);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      transition: transform 0.2s ease;
+    }
+    .pulse {
+      animation: pulse 0.5s ease;
     }
 
     .btn-group {
@@ -52,6 +58,7 @@
       justify-content: center;
       gap: 12px;
       margin: 20px 0;
+      flex-wrap: wrap;
     }
 
     button {
@@ -68,10 +75,10 @@
     }
     button:hover {
       box-shadow: 0 12px 28px rgba(108, 99, 255, 0.5);
-      transform: translateY(-2px);
+      transform: translateY(-2px) scale(1.02);
     }
     button:active {
-      transform: translateY(1px);
+      transform: translateY(1px) scale(0.98);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
@@ -110,6 +117,7 @@
       display: flex;
       flex-direction: column;
       max-height: 300px;
+      animation: fadeInUp 0.8s ease-out;
     }
 
     .section h2 {
@@ -139,7 +147,9 @@
       border-bottom: 1px solid #2A2A2D;
       font-size: 0.95rem;
       color: #EDEDED;
-      transition: background 0.2s;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeSlideIn 0.5s ease forwards;
     }
     .entry:hover {
       background: rgba(255,255,255,0.05);
@@ -160,6 +170,71 @@
     }
     #commentInput {
       flex: 1;
+    }
+
+    /* Bible verses */
+    .verses {
+      margin-top: 50px;
+      padding: 20px;
+      background: #1A1A1C;
+      border-radius: 14px;
+      border: 1px solid #2A2A2D;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      animation: fadeInUp 1s ease-out;
+    }
+    .verses h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #6C63FF, #4A90E2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .verse {
+      margin-bottom: 14px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .verse:last-child { margin-bottom: 0; }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      body {
+        padding: 30px 12px;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+      #counter {
+        font-size: 2.4rem;
+      }
+      .card {
+        padding: 24px;
+      }
+      .sections {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -198,6 +273,12 @@
     </div>
   </div>
 
+  <div class="verses">
+    <h2>Bible Verses</h2>
+    <div class="verse">Matthew 28:19-20 — “Go therefore and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit, teaching them to observe all that I have commanded you. And behold, I am with you always, to the end of the age.”</div>
+    <div class="verse">Mark 1:17 — “And Jesus said to them, ‘Follow me, and I will make you become fishers of men.’”</div>
+  </div>
+
 <script>
   const counterEl = document.getElementById("counter");
   const commentList = document.getElementById("commentList");
@@ -222,6 +303,7 @@
     });
     const data = await res.json();
     render(data);
+    pulseCounter();
   }
 
   function customAdd() {
@@ -267,6 +349,12 @@
       div.innerHTML = `${l.action > 0 ? "+" : ""}${l.action} → ${l.newValue}<span class="timestamp">${formatTime(l.timestamp)}</span>`;
       logList.appendChild(div);
     });
+  }
+
+  function pulseCounter() {
+    counterEl.classList.remove("pulse");
+    void counterEl.offsetWidth; // restart animation
+    counterEl.classList.add("pulse");
   }
 
   loadData();
