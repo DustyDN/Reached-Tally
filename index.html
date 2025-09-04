@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Reached</title>
+  <title>Global Counter</title>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
     #counter { font-size: 4em; margin: 20px; }
@@ -10,7 +10,7 @@
   </style>
 </head>
 <body>
-  <h1>Reached</h1>
+  <h1>🌍 Global Counter</h1>
   <div id="counter">Loading...</div>
   <button onclick="updateCounter(1)">+1</button>
   <button onclick="updateCounter(-1)">-1</button>
@@ -19,25 +19,31 @@
     const counterElement = document.getElementById("counter");
 
     async function getCounter() {
-      const res = await fetch("/.netlify/functions/counter");
-      const data = await res.json();
-      counterElement.textContent = data.value;
+      try {
+        const res = await fetch("/.netlify/functions/counter");
+        const data = await res.json();
+        counterElement.textContent = data.value;
+      } catch (err) {
+        counterElement.textContent = "Error loading counter";
+        console.error(err);
+      }
     }
 
     async function updateCounter(change) {
-      const res = await fetch("/.netlify/functions/counter", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ change })
-      });
-      const data = await res.json();
-      counterElement.textContent = data.value;
+      try {
+        const res = await fetch("/.netlify/functions/counter", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ change })
+        });
+        const data = await res.json();
+        counterElement.textContent = data.value; // update immediately after change
+      } catch (err) {
+        console.error("Error updating counter:", err);
+      }
     }
 
-    // Refresh counter every 2 seconds so all clients stay synced
-    setInterval(getCounter, 10000);
-
-    // Load initial value
+    // Only load once when page starts
     getCounter();
   </script>
 </body>
