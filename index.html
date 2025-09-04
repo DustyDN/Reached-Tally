@@ -253,7 +253,7 @@
     </div>
     <div id="localClicker">Your clicks: 0</div>
     <div class="btn-group">
-      <button id="refresh" onclick="loadData()">Refresh</button>
+      <button id="refresh" onclick="loadData(this)">Refresh</button>
     </div>
   </div>
 
@@ -288,11 +288,24 @@
   const localClickerEl = document.getElementById("localClicker");
   let localClicks = 0;
 
-  async function loadData() {
-    const res = await fetch("/.netlify/functions/counter");
-    const data = await res.json();
-    render(data);
+  async function loadData(btn) {
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Refreshing…";
   }
+
+  const res = await fetch("/.netlify/functions/counter");
+  const data = await res.json();
+  render(data);
+
+  if (btn) {
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = "Refresh";
+    }, 500); // 0.5s cooldown
+  }
+}
+
 
   async function updateCounter(change) {
     localClicks += Math.abs(change);
