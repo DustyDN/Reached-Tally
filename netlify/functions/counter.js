@@ -6,31 +6,77 @@ export async function handler(event) {
     return { statusCode: 500, body: "Missing Redis credentials" };
   }
 
-  // Handle GET request → return current counter
-  if (event.httpMethod === "GET") {
-    const res = await fetch(`${UPSTASH_URL}/get/counter`, {
-      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+  const headers = { Authorization: `Bearer ${UPSTASH_TOKEN}` };
+
+  // Helper: get current site data (counter, log, comments)
+  async function getSiteData() {
+    const res = await fetch(`${UPSTASH_URL}/get/site_data`, { headers });
+    const data = await res.json();
+    if (!data.result) {
+      return { counter: 0, log: [], comments: [] }; // default
+    }
+    try {
+      return JSON.parse(data.result);
+    } catch {
+      return { counter: 0, log: [], comments: [] }; // reset if corrupted
+    }
+  }
+
+  // Helper: save site data
+  async function saveSiteData(newData) {
+    await fetch(`${UPSTASH_URL}/set/site_data/${encodeURIComponent(JSON.stringify(newData))}`, {
+      headers
     });
-    const value = await res.json();
+  }
+
+  // Handle GET request → return full site data
+  if (event.httpMethod === "GET") {
+    const siteData = await getSiteData();
     return {
       statusCode: 200,
-      body: JSON.stringify({ value: value.result || 0 })
+      body: JSON.stringify(siteData)
     };
   }
 
-  // Handle POST request → update counter
+  // Handle POST request → update site data
   if (event.httpMethod === "POST") {
     const body = JSON.parse(event.body || "{}");
-    const change = body.change || 0;
+    const { change, comment } = body;
 
-    const res = await fetch(`${UPSTASH_URL}/incrby/counter/${change}`, {
-      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
-    });
-    const value = await res.json();
+    const siteData = await getSiteData();
+
+    // Update counter + log
+    if (typeof change === "number") {
+      siteData.counter += change;
+      siteData.log.push({
+        action: change,
+        newValue: siteData.counter,
+        timestamp: new Date().toISOString()
+      });
+      // Keep only last 100 log entries
+      if (siteData.log.length > 100) {
+        siteData.log = siteData.log.slice(-100);
+      }
+    }
+
+    // Add comment
+    if (comment && comment.trim() !== "") {
+      siteData.comments.push({
+        text: comment.trim(),
+        timestamp: new Date().toISOString()
+      });
+      // Keep only last 25 comments
+      if (siteData.comments.length > 25) {
+        siteData.comments = siteData.comments.slice(-25);
+      }
+    }
+
+    // Save back to Redis
+    await saveSiteData(siteData);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ value: value.result })
+      body: JSON.stringify(siteData)
     };
   }
 
