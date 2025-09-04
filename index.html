@@ -1,332 +1,173 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Reached Tally — Global Counter</title>
-<style>
-  :root{
-    --bg:#0f1724;        /* dark slate */
-    --card:#0b1220;      /* slightly lighter */
-    --accent:#60a5fa;    /* cool blue */
-    --muted:#94a3b8;     /* muted text */
-    --glass: rgba(255,255,255,0.03);
-    --glass-2: rgba(255,255,255,0.02);
-    --accent-2:#38bdf8;  /* secondary */
-    --good: #10b981;
-    --danger:#fb7185;
-    --radius:14px;
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  }
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,#071022 0%, #08121a 100%);color:#e6eef8;}
-  .wrap{
-    max-width:980px;margin:36px auto;padding:28px; display:grid;
-    grid-template-columns: 260px 1fr 320px; gap:20px; align-items:start;
-  }
-
-  /* left column: session log */
-  .panel{
-    background:linear-gradient(180deg,var(--card), rgba(11,18,32,0.9));
-    padding:18px;border-radius:var(--radius); box-shadow:0 8px 30px rgba(2,6,23,0.6);
-    border: 1px solid rgba(255,255,255,0.02);
-  }
-  h1{font-size:20px;margin:0 0 12px 0;display:flex;gap:10px;align-items:center}
-  .logo {
-    width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
-    display:flex;align-items:center;justify-content:center;font-weight:700;color:#04263b; box-shadow:0 4px 16px rgba(96,165,250,0.12);
-  }
-  .muted { color:var(--muted); font-size:13px; margin-top:8px; }
-
-  /* global counter card (center) */
-  .counter-card{
-    background: linear-gradient(180deg,var(--glass),var(--glass-2));
-    padding:28px;border-radius:18px; display:flex;flex-direction:column; align-items:center; gap:18px;
-    border:1px solid rgba(255,255,255,0.03);
-  }
-
-  #globalValue{
-    font-size:72px;font-weight:700;line-height:1; color: #eaf5ff;
-    background: linear-gradient(90deg,#fff,#d9f3ff);
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-    text-shadow: 0 8px 30px rgba(2,6,23,0.6);
-    min-width: 220px; text-align:center;
-  }
-
-  .controls { display:flex; gap:12px; align-items:center; }
-  .btn {
-    background:transparent;border:1px solid rgba(255,255,255,0.06); color:#eaf5ff; padding:12px 18px;border-radius:12px;
-    font-size:18px; cursor:pointer; transition: transform .12s ease, box-shadow .12s ease, background .12s;
-    box-shadow: 0 6px 18px rgba(2,6,23,0.45);
-  }
-  .btn:active{ transform: translateY(2px) scale(.995); }
-  .btn:hover{ box-shadow: 0 10px 28px rgba(2,6,23,0.55); }
-  .btn-accent{ background: linear-gradient(180deg,var(--accent),var(--accent-2)); color:#04263b; border:none; }
-  .btn-danger{ background: linear-gradient(180deg,var(--danger),#fda4af); color:#111; border:none; }
-
-  /* custom add */
-  .custom-add { display:flex; gap:8px; align-items:center; margin-top:6px; }
-  .input {
-    padding:10px 12px; border-radius:10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03);
-    color:var(--muted); min-width:110px;
-  }
-
-  /* right column: comments and fun counter */
-  .comments { display:flex; flex-direction:column; gap:12px; }
-  .comment-box { min-height:120px; max-height:240px; overflow:auto; padding:12px; border-radius:10px; background:rgba(255,255,255,0.015); border:1px solid rgba(255,255,255,0.02); }
-  .comment-row{ display:flex; gap:8px; align-items:flex-start; padding:8px; border-radius:8px; }
-  .comment-row small{ display:block; color:var(--muted); font-size:12px; }
-
-  .fun {
-    margin-top:6px; display:flex; gap:10px; align-items:center; justify-content:space-between;
-    padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  }
-
-  /* session log list */
-  .log-list{ margin-top:6px; max-height:520px; overflow:auto; padding-top:6px; display:flex; flex-direction:column; gap:8px; }
-  .log-item{ font-size:13px; color:var(--muted); padding:8px; border-radius:10px; background:rgba(255,255,255,0.01); border:1px solid rgba(255,255,255,0.01); }
-
-  /* small helpers */
-  .row { display:flex; gap:10px; align-items:center; }
-  .tiny { font-size:12px; color:var(--muted); }
-  footer { text-align:center;color:var(--muted); margin-top:28px; font-size:13px; }
-
-  /* responsive */
-  @media (max-width:920px){
-    .wrap{ grid-template-columns: 1fr; padding:18px }
-    .panel, .counter-card, .comments{ order: unset; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>🌍 Global Counter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9fafb;
+      color: #111;
+      text-align: center;
+      padding: 40px;
+    }
+    #counter {
+      font-size: 4em;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+    button {
+      font-size: 1.5em;
+      margin: 10px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+      transition: 0.2s;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    #comments, #log {
+      max-width: 500px;
+      margin: 30px auto;
+      text-align: left;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 1.3em;
+    }
+    .entry {
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 0.95em;
+    }
+    .entry:last-child {
+      border-bottom: none;
+    }
+    #commentBox {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+    #commentInput {
+      flex: 1;
+      padding: 8px;
+      font-size: 1em;
+    }
+    #refresh {
+      margin-top: 20px;
+      background: #6b7280;
+    }
+    #refresh:hover {
+      background: #4b5563;
+    }
+  </style>
 </head>
 <body>
-  <div class="wrap" id="app">
-    <!-- LEFT: session log -->
-    <aside class="panel" id="left-panel">
-      <h1><span class="logo">🐟</span> Session Log</h1>
-      <div class="muted">A lightweight log that records updates while this page is open (not global).</div>
-      <div class="log-list" id="sessionLog" aria-live="polite"></div>
-      <div style="margin-top:12px" class="tiny">Tip: use the Refresh button in the main card to pull the latest global value from the server.</div>
-    </aside>
+  <h1>🌍 Global Counter</h1>
+  <div id="counter">Loading...</div>
+  <button onclick="updateCounter(1)">+1</button>
+  <button onclick="updateCounter(-1)">-1</button>
+  <br>
+  <button id="refresh" onclick="loadData()">🔄 Refresh</button>
 
-    <!-- CENTER: global counter card -->
-    <main class="counter-card" role="main">
-      <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <h1 style="margin:0;">Reached Tally</h1>
-          <div class="muted">Global value (updates only when clicked)</div>
-        </div>
-        <div style="text-align:right;">
-          <button id="refreshBtn" class="btn" title="Fetch latest from server">Refresh</button>
-        </div>
-      </div>
-
-      <div id="globalValue" aria-live="polite">—</div>
-
-      <div class="controls">
-        <button id="minusBtn" class="btn">-1</button>
-        <button id="plusBtn" class="btn btn-accent">+1</button>
-      </div>
-
-      <div class="custom-add">
-        <input id="customInput" class="input" type="number" placeholder="Custom number (e.g. 5)" />
-        <button id="addCustom" class="btn">Add</button>
-        <div style="flex:1"></div>
-        <div class="tiny">Last updated: <span id="lastUpdated">—</span></div>
-      </div>
-
-      <div style="margin-top:6px; width:100%; display:flex; gap:8px;">
-        <div class="tiny" style="flex:1">Status: <span id="statusText">idle</span></div>
-        <div class="tiny">Requests saved: <span id="requestCount">0</span></div>
-      </div>
-    </main>
-
-    <!-- RIGHT: comments and fun counter -->
-    <aside class="panel comments">
-      <div>
-        <h1 style="font-size:16px;margin:0;">Comments</h1>
-        <div class="muted">Public comments (local only — I can add persistent comments later if you want)</div>
-      </div>
-
-      <div class="comment-box" id="commentsBox" aria-live="polite"></div>
-
-      <div style="display:flex; gap:8px;">
-        <input id="commentInput" class="input" type="text" placeholder="Leave a comment (local only)" />
-        <button id="postComment" class="btn btn-accent">Post</button>
-      </div>
-
-      <div class="fun">
-        <div style="display:flex; flex-direction:column;">
-          <div class="tiny">Fun Counter</div>
-          <div style="font-weight:700;font-size:28px;" id="funValue">0</div>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button id="funPlus" class="btn">+1</button>
-          <button id="funReset" class="btn">Reset</button>
-        </div>
-      </div>
-    </aside>
+  <div id="comments">
+    <h2>💬 Comments</h2>
+    <div id="commentList"></div>
+    <div id="commentBox">
+      <input id="commentInput" type="text" placeholder="Write a comment..." />
+      <button onclick="postComment()">Send</button>
+    </div>
   </div>
 
-  <footer style="max-width:980px;margin:0 auto;padding:6px 28px;">
-    Built minimalist &mdash; global updates only on user actions. Want comments & logs persisted globally? Ask and I’ll add server functions.
-  </footer>
+  <div id="log">
+    <h2>📜 Recent Activity</h2>
+    <div id="logList"></div>
+  </div>
 
-<script>
-/*
-  Behavior:
-  - On load: fetch global counter once
-  - On +1 / -1 / Add: POST to /.netlify/functions/counter { change }
-  - Update UI immediately after receiving response
-  - Session log is stored in memory for this page session (not persisted)
-  - Comments stored in localStorage (so they survive refresh locally), not global
-  - A small request count displayed (counts GET/POST attempted from this browser session)
-*/
+  <script>
+    const counterEl = document.getElementById("counter");
+    const commentList = document.getElementById("commentList");
+    const logList = document.getElementById("logList");
+    const commentInput = document.getElementById("commentInput");
 
-const API_BASE = "/.netlify/functions/counter";
-const globalValueEl = document.getElementById("globalValue");
-const statusEl = document.getElementById("statusText");
-const lastUpdatedEl = document.getElementById("lastUpdated");
-const requestCountEl = document.getElementById("requestCount");
-const sessionLogEl = document.getElementById("sessionLog");
-const commentsBox = document.getElementById("commentsBox");
-
-let requestCount = 0;
-let sessionLog = [];
-
-function setStatus(s) {
-  statusEl.textContent = s;
-}
-
-function setGlobal(val) {
-  globalValueEl.textContent = val;
-  lastUpdatedEl.textContent = (new Date()).toLocaleTimeString();
-}
-
-// update session log (keeps small list)
-function pushLog(entry) {
-  sessionLog.unshift(entry);
-  if (sessionLog.length > 200) sessionLog.length = 200;
-  renderLog();
-}
-
-function renderLog(){
-  sessionLogEl.innerHTML = "";
-  sessionLog.slice(0,100).forEach(it => {
-    const div = document.createElement("div");
-    div.className = "log-item";
-    div.textContent = it;
-    sessionLogEl.appendChild(div);
-  });
-}
-
-/* Comments (localStorage) */
-function loadComments() {
-  const raw = localStorage.getItem("reached_comments_v1");
-  let arr = [];
-  try { arr = JSON.parse(raw) || []; } catch(e){ arr=[]; }
-  renderComments(arr);
-}
-function renderComments(arr) {
-  commentsBox.innerHTML = "";
-  if (!arr.length) {
-    commentsBox.innerHTML = '<div class="tiny" style="padding:6px;color:var(--muted)">No comments yet</div>';
-    return;
-  }
-  arr.slice().reverse().forEach(c => {
-    const row = document.createElement("div");
-    row.className = "comment-row";
-    row.innerHTML = `<div style="flex:1"><strong>${escapeHTML(c.name||'anon')}</strong><br><small>${escapeHTML(c.text)}</small></div>`;
-    commentsBox.appendChild(row);
-  });
-}
-function saveComment(text) {
-  const name = "User";
-  const raw = localStorage.getItem("reached_comments_v1");
-  let arr = [];
-  try { arr = JSON.parse(raw) || []; } catch(e){ arr=[]; }
-  arr.push({ name, text, time: Date.now() });
-  localStorage.setItem("reached_comments_v1", JSON.stringify(arr));
-  renderComments(arr);
-}
-
-function escapeHTML(s){ return String(s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
-
-/* Fetch current global value (GET) */
-async function getCounter() {
-  setStatus("fetching");
-  try {
-    requestCount++; requestCountEl.textContent = requestCount;
-    const r = await fetch(API_BASE);
-    if (!r.ok) throw new Error('Fetch failed: ' + r.status);
-    const json = await r.json();
-    setGlobal(json.value);
-    setStatus("synced");
-  } catch(err) {
-    console.error(err);
-    setStatus("error");
-    globalValueEl.textContent = "—";
-  }
-}
-
-/* Send change (POST) and update UI only when response comes back */
-async function sendChange(change) {
-  setStatus("sending");
-  try {
-    requestCount++; requestCountEl.textContent = requestCount;
-    const r = await fetch(API_BASE, {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({ change })
-    });
-    if (!r.ok) {
-      throw new Error("Server error " + r.status);
+    // Load global data (counter, comments, log)
+    async function loadData() {
+      try {
+        const res = await fetch("/.netlify/functions/counter");
+        const data = await res.json();
+        render(data);
+      } catch (err) {
+        counterEl.textContent = "Error loading data";
+        console.error(err);
+      }
     }
-    const data = await r.json();
-    setGlobal(data.value);
-    setStatus("updated");
-    pushLog(`${change > 0 ? '+'+change : change} → ${data.value} (${(new Date()).toLocaleTimeString()})`);
-  } catch(err) {
-    console.error("Update failed:", err);
-    setStatus("error");
-  }
-}
 
-/* DOM hookups */
-document.getElementById("plusBtn").addEventListener("click", ()=>sendChange(1));
-document.getElementById("minusBtn").addEventListener("click", ()=>sendChange(-1));
-document.getElementById("addCustom").addEventListener("click", ()=>{
-  const v = Number(document.getElementById("customInput").value || 0);
-  if (!Number.isFinite(v) || v === 0) return;
-  sendChange(v);
-  document.getElementById("customInput").value = '';
-});
-document.getElementById("refreshBtn").addEventListener("click", getCounter);
+    // Update counter
+    async function updateCounter(change) {
+      try {
+        const res = await fetch("/.netlify/functions/counter", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ change })
+        });
+        const data = await res.json();
+        render(data);
+      } catch (err) {
+        console.error("Error updating counter:", err);
+      }
+    }
 
-/* comments */
-document.getElementById("postComment").addEventListener("click", ()=>{
-  const text = document.getElementById("commentInput").value.trim();
-  if (!text) return;
-  saveComment(text);
-  document.getElementById("commentInput").value = "";
-});
+    // Post a comment
+    async function postComment() {
+      const text = commentInput.value.trim();
+      if (!text) return;
+      try {
+        const res = await fetch("/.netlify/functions/counter", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ comment: text })
+        });
+        const data = await res.json();
+        render(data);
+        commentInput.value = "";
+      } catch (err) {
+        console.error("Error posting comment:", err);
+      }
+    }
 
-/* fun counter (local) */
-let funValue = Number(localStorage.getItem("reached_fun_v1")||0);
-function setFun(v){ funValue = v; document.getElementById("funValue").textContent = funValue; localStorage.setItem("reached_fun_v1", String(funValue)); }
-document.getElementById("funPlus").addEventListener("click", ()=> setFun(funValue + 1));
-document.getElementById("funReset").addEventListener("click", ()=> setFun(0));
+    // Render UI from global state
+    function render(data) {
+      counterEl.textContent = data.counter ?? 0;
 
-/* init */
-(function init(){
-  setStatus("idle");
-  requestCountEl.textContent = requestCount;
-  // session log starter
-  pushLog("Session started: " + (new Date()).toLocaleTimeString());
-  // load local comments and fun counter
-  loadComments();
-  setFun(funValue);
-  // fetch the global counter once
-  getCounter();
-})();
-</script>
+      // Render comments
+      commentList.innerHTML = "";
+      data.comments.slice().reverse().forEach(c => {
+        const div = document.createElement("div");
+        div.className = "entry";
+        div.textContent = `${c.text} (${new Date(c.timestamp).toLocaleTimeString()})`;
+        commentList.appendChild(div);
+      });
+
+      // Render log
+      logList.innerHTML = "";
+      data.log.slice().reverse().forEach(l => {
+        const div = document.createElement("div");
+        div.className = "entry";
+        div.textContent = `${l.action > 0 ? "+" : ""}${l.action} → ${l.newValue} (${new Date(l.timestamp).toLocaleTimeString()})`;
+        logList.appendChild(div);
+      });
+    }
+
+    // Initial load
+    loadData();
+  </script>
 </body>
 </html>
