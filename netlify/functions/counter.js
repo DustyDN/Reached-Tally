@@ -8,17 +8,17 @@ export async function handler(event) {
 
   const headers = { Authorization: `Bearer ${UPSTASH_TOKEN}` };
 
-  // Helper: get current site data (counter, log, comments)
+  // Helper: get current site data
   async function getSiteData() {
     const res = await fetch(`${UPSTASH_URL}/get/site_data`, { headers });
     const data = await res.json();
     if (!data.result) {
-      return { counter: 0, log: [], comments: [] }; // default
+      return { counter: 0, log: [], comments: [] };
     }
     try {
       return JSON.parse(data.result);
     } catch {
-      return { counter: 0, log: [], comments: [] }; // reset if corrupted
+      return { counter: 0, log: [], comments: [] };
     }
   }
 
@@ -29,7 +29,7 @@ export async function handler(event) {
     });
   }
 
-  // Handle GET request → return full site data
+  // Handle GET → return full global state
   if (event.httpMethod === "GET") {
     const siteData = await getSiteData();
     return {
@@ -38,14 +38,14 @@ export async function handler(event) {
     };
   }
 
-  // Handle POST request → update site data
+  // Handle POST → update state
   if (event.httpMethod === "POST") {
     const body = JSON.parse(event.body || "{}");
     const { change, comment } = body;
 
-    const siteData = await getSiteData();
+    let siteData = await getSiteData();
 
-    // Update counter + log
+    // Update counter
     if (typeof change === "number") {
       siteData.counter += change;
       siteData.log.push({
@@ -53,7 +53,6 @@ export async function handler(event) {
         newValue: siteData.counter,
         timestamp: new Date().toISOString()
       });
-      // Keep only last 100 log entries
       if (siteData.log.length > 100) {
         siteData.log = siteData.log.slice(-100);
       }
@@ -65,13 +64,12 @@ export async function handler(event) {
         text: comment.trim(),
         timestamp: new Date().toISOString()
       });
-      // Keep only last 25 comments
       if (siteData.comments.length > 25) {
         siteData.comments = siteData.comments.slice(-25);
       }
     }
 
-    // Save back to Redis
+    // Save global state
     await saveSiteData(siteData);
 
     return {
